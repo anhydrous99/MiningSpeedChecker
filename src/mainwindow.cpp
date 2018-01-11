@@ -21,12 +21,12 @@ mainwindow::mainwindow() : Fl_Window(400, 211, "MiningSpeedChecker")
 {
   taddInput = new Fl_Input(0, 0, 300, 30, "Enter taddress:");
   refreshButton = new Fl_Button(301, 0, 99, 30, "Refresh");
-  minerBox = new Fl_Box(0, 30, 400, 30, "1");
-  totalSolsBox = new Fl_Box(0, 60, 400, 30, "2");
-  networkSolsBox = new Fl_Box(0, 90, 400, 30, "3");
-  immaturebalanceBox = new Fl_Box(0, 120, 400, 30, "4");
-  balanceBox = new Fl_Box(0, 150, 400, 30, "5");
-  paidBox = new Fl_Box(0, 180, 400, 30, "6");
+  minerBox = new Fl_Box(0, 30, 400, 30, " ");
+  totalSolsBox = new Fl_Box(0, 60, 400, 30, " ");
+  networkSolsBox = new Fl_Box(0, 90, 400, 30, " ");
+  immaturebalanceBox = new Fl_Box(0, 120, 400, 30, " ");
+  balanceBox = new Fl_Box(0, 150, 400, 30, " ");
+  paidBox = new Fl_Box(0, 180, 400, 30, " ");
   refreshButton->callback(onRefreshButtonPressed, (void*)this);
   checkRead();
 }

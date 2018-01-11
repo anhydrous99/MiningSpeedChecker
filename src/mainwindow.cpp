@@ -113,12 +113,6 @@ void mainwindow::update(std::string tadd)
       return;
     }
 
-    assert(d["totalHash"].IsDouble());
-    assert(d["networkSols"].IsString());
-    assert(d["immature"].IsDouble());
-    assert(d["balance"].IsDouble());
-    assert(d["paid"].IsDouble());
-
     std::ostringstream buffer;
     buffer << "Total Hashrate: " << std::setprecision(8) << (d["totalHash"].GetDouble() / 500000.0) << " Sol/s";
     totalSols = buffer.str();

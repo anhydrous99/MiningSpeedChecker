@@ -8,12 +8,13 @@
 
 #include <curl/curl.h>
 
-#include <FL/Fl.H>
-#include <FL/fl_ask.H>
-
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
+
+#include <FL/Fl.H>
+#include <FL/fl_ask.H>
+
 using namespace rapidjson;
 
 mainwindow::mainwindow() : Fl_Window(400, 211, "MiningSpeedChecker")

@@ -99,6 +99,9 @@ void mainwindow::update(std::string tadd)
     /* always cleanup */
     curl_easy_cleanup(curl);
     //--------------------------------------
+#ifndef NDEBUG
+    std::cout << readBuffer << std::endl;
+#endif
     Document d;
     d.Parse(readBuffer.c_str());
     std::string totalSols, networkSols, immaturebalance, balance, paid;
@@ -107,9 +110,15 @@ void mainwindow::update(std::string tadd)
     bool h_2 = d.HasMember("immature");
     bool h_3 = d.HasMember("balance");
     bool h_4 = d.HasMember("paid");
-    if (!(h_0 & h_1 & h_2 & h_3 & h_4))
+    bool h_5 = d.HasMember("pool");
+    if (!(h_0 & h_1 & h_2 & h_3 & h_4 & h_5))
     {
       fl_alert("Error: returned from API is missing information.");
+      return;
+    }
+    if(d["networkSols"].IsInt())
+    {
+      fl_alert("Error: account is not active.");
       return;
     }
 

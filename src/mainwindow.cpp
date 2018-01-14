@@ -122,6 +122,8 @@ void mainwindow::update(std::string tadd)
       return;
     }
 
+    std::string pool = (d["pool"].IsString()) ? d["pool"].GetString() : "";
+
     std::ostringstream buffer;
     buffer << "Total Hashrate: " << std::setprecision(8) << (d["totalHash"].GetDouble() / 500000.0) << " Sol/s";
     totalSols = buffer.str();
@@ -132,15 +134,15 @@ void mainwindow::update(std::string tadd)
     networkSols = buffer1.str();
 
     std::ostringstream buffer2;
-    buffer2 << "Immature: " << std::setprecision(8) << d["immature"].GetDouble() << " Hush"; 
+    buffer2 << "Immature: " << std::setprecision(8) << d["immature"].GetDouble() << " " << pool; 
     immaturebalance = buffer2.str();
 
     std::ostringstream buffer3;
-    buffer3 << "Balance: " <<  std::setprecision(8) << d["balance"].GetDouble() << " Hush";
+    buffer3 << "Balance: " <<  std::setprecision(8) << d["balance"].GetDouble() << " " << pool;
     balance = buffer3.str();
 
     std::ostringstream buffer4;
-    buffer4 << "Paid: " << std::setprecision(8) << d["paid"].GetDouble() << " Hush";
+    buffer4 << "Paid: " << std::setprecision(8) << d["paid"].GetDouble() << " " << pool;
     paid = buffer4.str();
 
     if(!conf_exists || minerBox->label() != taddInput->value())

@@ -10,6 +10,7 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Input.H>
+#include <FL/Fl_Chart.H>
 
 #include <string>
 
@@ -27,6 +28,7 @@ public:
   Fl_Box *immaturebalanceBox;
   Fl_Box *balanceBox;
   Fl_Box *paidBox;
+  Fl_Chart *hashrateChart;
 private:
   bool conf_exists = false;
   static void onRefreshButtonPressed(Fl_Widget*, void*);

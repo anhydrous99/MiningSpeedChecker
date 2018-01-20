@@ -1,10 +1,12 @@
 #include "mainwindow.h"
 
-#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <iomanip>
-#include <functional>
+#include <cstdint>
+#include <map>
+#include <utility>
+#include <ctime>
 
 #include <curl/curl.h>
 
@@ -17,16 +19,18 @@
 
 using namespace rapidjson;
 
-mainwindow::mainwindow() : Fl_Window(400, 211, "MiningSpeedChecker")
+mainwindow::mainwindow() : Fl_Window(420, 430, "MiningSpeedChecker")
 {
-  taddInput = new Fl_Input(0, 0, 300, 30, "Enter taddress:");
-  refreshButton = new Fl_Button(301, 0, 99, 30, "Refresh");
-  minerBox = new Fl_Box(0, 30, 400, 30, " ");
-  totalSolsBox = new Fl_Box(0, 60, 400, 30, " ");
-  networkSolsBox = new Fl_Box(0, 90, 400, 30, " ");
-  immaturebalanceBox = new Fl_Box(0, 120, 400, 30, " ");
-  balanceBox = new Fl_Box(0, 150, 400, 30, " ");
-  paidBox = new Fl_Box(0, 180, 400, 30, " ");
+  taddInput = new Fl_Input(5, 0, 300, 30, "Enter taddress:");
+  refreshButton = new Fl_Button(311, 0, 99, 30, "Refresh");
+  minerBox = new Fl_Box(10, 30, 400, 30, " ");
+  totalSolsBox = new Fl_Box(10, 60, 400, 30, " ");
+  networkSolsBox = new Fl_Box(10, 90, 400, 30, " ");
+  immaturebalanceBox = new Fl_Box(10, 120, 400, 30, " ");
+  balanceBox = new Fl_Box(10, 150, 400, 30, " ");
+  paidBox = new Fl_Box(10, 180, 400, 30, " ");
+  hashrateChart = new Fl_Chart(10, 210, 400, 200, "Chart");
+  hashrateChart->type(FL_LINE_CHART);
   refreshButton->callback(onRefreshButtonPressed, (void*)this);
   checkRead();
 }
@@ -144,6 +148,57 @@ void mainwindow::update(std::string tadd)
     std::ostringstream buffer4;
     buffer4 << "Paid: " << std::setprecision(8) << d["paid"].GetDouble() << " " << pool;
     paid = buffer4.str();
+
+    auto conv_fun = [](std::time_t t, double hr) {
+        std::ostringstream ss;
+        ss << std::put_time(std::localtime(&t), "%I:%M%p");
+        ss << std::setprecision(2) << hr << "H/s";
+        return ss.str();
+      };
+
+    std::map<std::string, double> info;
+    const Value& a = d["history"];
+    bool first = true;
+    int _min, _max;
+    for(Value::ConstMemberIterator itr = a.MemberBegin();
+        itr != a.MemberEnd(); ++itr)
+    {
+      const Value& b = itr->value;
+      assert(b.IsArray());
+      for (SizeType i = 0; i < b.Size(); i++)
+      {
+        const Value& las = b[i];
+        double hashrate = las["hashrate"].GetDouble() / 500000.0;
+        std::string strtime = conv_fun(static_cast<std::time_t>(las["time"].GetInt()), hashrate);
+        if (!info.count(strtime))
+          info.insert(std::pair<std::string, double>(strtime, hashrate));
+        else
+          info.at(strtime)+=hashrate;
+
+        if (first)
+        {
+          _min = hashrate;
+          _max = hashrate;
+          first = false;
+        }
+        else
+        {
+          if (_min > hashrate)
+            _min = hashrate;
+          if (_max < hashrate)
+            _max = hashrate;
+        }
+      }
+    }
+    hashrateChart->clear();
+    hashrateChart->bounds(_min, _max);
+    int i = 0;
+    for(auto& item : info) {
+      if (i % 2 == 0)
+        hashrateChart->add(item.second, (i%30==0&&i!=0)?item.first.c_str():0, FL_RED);
+      i++;
+    }
+    hashrateChart->redraw();
 
     if(!conf_exists || minerBox->label() != taddInput->value())
       create_or_modify_config(tadd);

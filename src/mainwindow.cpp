@@ -6,8 +6,6 @@
 #include <cstdint>
 #include <map>
 #include <utility>
-#include <algorithm>
-#include <iterator>
 #include <ctime>
 
 #include <curl/curl.h>

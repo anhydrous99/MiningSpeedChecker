@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <map>
 #include <utility>
+#include <algorithm>
+#include <iterator>
 #include <ctime>
 
 #include <curl/curl.h>
@@ -156,7 +158,7 @@ void mainwindow::update(std::string tadd)
         return ss.str();
       };
 
-    std::map<std::string, double> info;
+    std::map<std::time_t, double> info;
     const Value& a = d["history"];
     bool first = true;
     int _min, _max;
@@ -169,16 +171,15 @@ void mainwindow::update(std::string tadd)
       {
         const Value& las = b[i];
         double hashrate = las["hashrate"].GetDouble() / 500000.0;
-        std::string strtime = conv_fun(static_cast<std::time_t>(las["time"].GetInt()), hashrate);
-        if (!info.count(strtime))
-          info.insert(std::pair<std::string, double>(strtime, hashrate));
+        std::time_t time = static_cast<std::time_t>(las["time"].GetInt());
+        if (!info.count(time))
+          info.insert(std::pair<std::time_t, double>(time, hashrate));
         else
-          info.at(strtime)+=hashrate;
+          info.at(time)+=hashrate;
 
         if (first)
         {
-          _min = hashrate;
-          _max = hashrate;
+          _min = _max = hashrate;
           first = false;
         }
         else
@@ -190,12 +191,15 @@ void mainwindow::update(std::string tadd)
         }
       }
     }
+
     hashrateChart->clear();
     hashrateChart->bounds(_min, _max);
     int i = 0;
     for(auto& item : info) {
       if (i % 2 == 0)
-        hashrateChart->add(item.second, (i%30==0&&i!=0)?item.first.c_str():0, FL_RED);
+        hashrateChart->add(item.second, 
+        (i % 30 == 0 && i != 0) ? conv_fun(item.first, item.second).c_str() : 0, 
+        FL_RED);
       i++;
     }
     hashrateChart->redraw();
